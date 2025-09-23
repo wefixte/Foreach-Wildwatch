@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
+import Constants from 'expo-constants';
 import { LocationData } from '../hooks/useCurrentPosition';
 
-const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1Ijoic3JheW5hdWQtbGFtb2JpbGVyeSIsImEiOiJjbWZmdTRienQwb2F4MmtzYmprNWxieWZwIn0.mgySs3rW_6jA7hEKCF7ycw';
+const MAPBOX_ACCESS_TOKEN = Constants.expoConfig?.extra?.mapboxAccessToken || process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
 const DEFAULT_MAP_CONFIG = {
   style: 'mapbox://styles/mapbox/streets-v12',
@@ -26,6 +27,15 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
   const mapRef = useRef<Mapbox.MapView>(null);
 
   useEffect(() => {
+    if (!MAPBOX_ACCESS_TOKEN) {
+      console.error('Mapbox access token is missing. Please check your .env file.');
+      Alert.alert(
+        'Configuration manquante',
+        'Le token Mapbox est manquant. Veuillez vérifier votre fichier .env.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
     Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
   }, []);
 
