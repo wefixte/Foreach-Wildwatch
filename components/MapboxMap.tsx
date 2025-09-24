@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet, Alert, Text } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
 import Constants from 'expo-constants';
 import { LocationData } from '../hooks/useCurrentPosition';
+import { Observation } from '../types/observation';
 
 const MAPBOX_ACCESS_TOKEN = Constants.expoConfig?.extra?.mapboxAccessToken || process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -17,12 +18,18 @@ interface MapboxMapProps {
   location: LocationData;
   style?: any;
   onMapReady?: () => void;
+  observations?: Observation[];
+  onMapPress?: (latitude: number, longitude: number) => void;
+  onMarkerPress?: (observation: Observation) => void;
 }
 
 export const MapboxMap: React.FC<MapboxMapProps> = ({ 
   location, 
   style, 
-  onMapReady 
+  onMapReady,
+  observations = [],
+  onMapPress,
+  onMarkerPress
 }) => {
   const mapRef = useRef<Mapbox.MapView>(null);
 
@@ -45,6 +52,22 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
     }
   };
 
+  const handleMapPress = (event: any) => {
+    if (onMapPress) {
+      const coords = event.coordinates || event.geometry?.coordinates || event.point;
+      if (coords && coords.length >= 2) {
+        const [longitude, latitude] = coords;
+        onMapPress(latitude, longitude);
+      }
+    }
+  };
+
+  const handleMarkerPress = (observation: Observation) => {
+    if (onMarkerPress) {
+      onMarkerPress(observation);
+    }
+  };
+
   const centerCoordinate: [number, number] = [location.longitude, location.latitude];
 
   return (
@@ -54,6 +77,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
         style={styles.map}
         styleURL={DEFAULT_MAP_CONFIG.style}
         onDidFinishLoadingMap={handleMapReady}
+        onPress={handleMapPress}
       >
         <Mapbox.Camera
           centerCoordinate={centerCoordinate}
@@ -70,11 +94,29 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
           coordinate={centerCoordinate}
         >
           <View style={styles.markerContainer}>
-            <View style={styles.marker}>
-              <View style={styles.markerInner} />
+            <View style={styles.userMarker}>
+              <View style={styles.userMarkerInner} />
             </View>
           </View>
         </Mapbox.PointAnnotation>
+
+        {/* Marqueurs des observations */}
+        {observations.map((observation) => (
+          <Mapbox.PointAnnotation
+            key={observation.id}
+            id={`observation-${observation.id}`}
+            coordinate={[observation.longitude, observation.latitude]}
+            onSelected={() => handleMarkerPress(observation)}
+          >
+            <View style={styles.markerContainer}>
+              <View style={styles.observationMarker}>
+                <Text style={styles.markerText}>
+                  {observation.name.charAt(0).toUpperCase()}
+                </Text>
+              </View>
+            </View>
+          </Mapbox.PointAnnotation>
+        ))}
       </Mapbox.MapView>
     </View>
   );
@@ -91,7 +133,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  marker: {
+  userMarker: {
     width: 20,
     height: 20,
     borderRadius: 10,
@@ -107,7 +149,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  markerInner: {
+  userMarkerInner: {
     width: 8,
     height: 8,
     borderRadius: 4,
@@ -115,5 +157,28 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 3,
     left: 3,
+  },
+  observationMarker: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#28a745',
+    borderWidth: 3,
+    borderColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  markerText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

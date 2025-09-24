@@ -98,7 +98,6 @@ export const useCurrentPosition = (): UseCurrentPositionReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la récupération de la position';
       setError(errorMessage);
-      console.error('Erreur de géolocalisation:', err);
     } finally {
       setLoading(false);
     }
@@ -120,7 +119,6 @@ export const useCurrentPosition = (): UseCurrentPositionReturn => {
           setPermissionStatus('undetermined');
         }
       } catch (err) {
-        console.error('Erreur lors de la vérification des permissions:', err);
         setPermissionStatus('denied');
       }
     };

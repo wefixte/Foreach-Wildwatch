@@ -4,7 +4,6 @@ export interface Observation {
   observationDate: string;
   latitude: number;
   longitude: number;
-  //image: string;
 }
 
 export interface CreateObservationData {

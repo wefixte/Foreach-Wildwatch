@@ -1,12 +1,16 @@
 import React from 'react';
 import { View, StyleSheet, Alert, Text, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useCurrentPosition, openLocationSettings } from '../hooks/useCurrentPosition';
+import { useObservations } from '../hooks/useObservations';
 import { LocationLoading } from '../components/LocationLoading';
 import { LocationError } from '../components/LocationError';
 import { MapboxMap } from '../components/MapboxMap';
 import { useEffect } from 'react';
+import { Observation } from '../types/observation';
 
 export default function Index() {
+  const router = useRouter();
   const {
     location,
     loading,
@@ -16,10 +20,11 @@ export default function Index() {
     refreshLocation,
   } = useCurrentPosition();
 
+  const { observations, isLoading, error: observationsError } = useObservations();
+
   // Demande automatique de permission au démarrage
   useEffect(() => {
     if (permissionStatus === 'undetermined' && !loading) {
-      console.log('Demande de permission...');
       requestPermission();
     }
   }, [permissionStatus, loading, requestPermission]);
@@ -29,11 +34,33 @@ export default function Index() {
   };
 
   const handleMapReady = () => {
-    console.log('Carte Mapbox prête');
+    // Carte prête
+  };
+
+  const handleMapPress = (latitude: number, longitude: number) => {
+    router.push({
+      pathname: '/observation' as any,
+      params: {
+        latitude: latitude.toString(),
+        longitude: longitude.toString(),
+        id: 'new'
+      }
+    });
+  };
+
+  const handleMarkerPress = (observation: Observation) => {
+    router.push({
+      pathname: '/observation' as any,
+      params: {
+        latitude: observation.latitude.toString(),
+        longitude: observation.longitude.toString(),
+        id: observation.id
+      }
+    });
   };
 
   // Écran de chargement
-  if (loading) {
+  if (loading || isLoading) {
     return <LocationLoading message="Chargement de la carte..." />;
   }
 
@@ -55,13 +82,23 @@ export default function Index() {
         <MapboxMap
           location={location}
           onMapReady={handleMapReady}
+          observations={observations}
+          onMapPress={handleMapPress}
+          onMarkerPress={handleMarkerPress}
           style={styles.mapFullScreen}
         />
+        
+        {observations.length > 0 && (
+          <View style={styles.observationsIndicator}>
+            <Text style={styles.observationsText}>
+              {observations.length} observation{observations.length > 1 ? 's' : ''}
+            </Text>
+          </View>
+        )}
       </View>
     );
   }
 
-  // Fallback
   return (
     <View style={styles.errorContainer}>
       <LocationLoading message="Initialisation..." />
@@ -75,6 +112,20 @@ const styles = StyleSheet.create({
   },
   mapFullScreen: {
     flex: 1,
+  },
+  observationsIndicator: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  observationsText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
   },
   permissionContainer: {
     flex: 1,
