@@ -12,7 +12,9 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Cette application a besoin d'accéder à votre localisation pour afficher votre position sur la carte.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "Cette application a besoin d'accéder à votre localisation pour afficher votre position sur la carte."
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Cette application a besoin d'accéder à votre localisation pour afficher votre position sur la carte.",
+        "NSCameraUsageDescription": "Cette application a besoin d'accéder à votre appareil photo pour prendre des photos d'observations.",
+        "NSPhotoLibraryUsageDescription": "Cette application a besoin d'accéder à votre galerie photo pour sélectionner des images d'observations."
       }
     },
     "android": {
@@ -27,7 +29,10 @@
       "package": "com.anonymous.ForeachWildwatch",
       "permissions": [
         "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION"
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
       ]
     },
     "web": {
@@ -55,6 +60,13 @@
           "locationAlwaysPermission": "Cette application a besoin d'accéder à votre localisation pour afficher votre position sur la carte.",
           "locationWhenInUsePermission": "Cette application a besoin d'accéder à votre localisation pour afficher votre position sur la carte.",
           "isAndroidBackgroundLocationEnabled": false
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Cette application a besoin d'accéder à votre galerie photo pour sélectionner des images d'observations.",
+          "cameraPermission": "Cette application a besoin d'accéder à votre appareil photo pour prendre des photos d'observations."
         }
       ],
       [

@@ -11,11 +11,13 @@ import {
   Modal
 } from 'react-native';
 import { CreateObservationData, UpdateObservationData } from '../types/observation';
+import { ImageSelector } from './ImageSelector';
 
 interface ObservationFormProps {
   initialData?: {
     name: string;
     observationDate: string;
+    imageUri?: string;
   };
   latitude?: number;
   longitude?: number;
@@ -40,6 +42,7 @@ export const ObservationForm: React.FC<ObservationFormProps> = ({
   const [observationDate, setObservationDate] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [imageUri, setImageUri] = useState<string | null>(null);
 
   // Fonction pour formater la date en français (jj-mm-aaaa)
   const formatDateToFrench = (date: Date): string => {
@@ -66,6 +69,7 @@ export const ObservationForm: React.FC<ObservationFormProps> = ({
     if (isEditing && initialData) {
       setName(initialData.name);
       setObservationDate(initialData.observationDate);
+      setImageUri(initialData.imageUri || null);
       const parsedDate = parseFrenchDate(initialData.observationDate);
       if (parsedDate) {
         setSelectedDate(parsedDate);
@@ -75,6 +79,7 @@ export const ObservationForm: React.FC<ObservationFormProps> = ({
       const formattedDate = formatDateToFrench(today);
       setObservationDate(formattedDate);
       setSelectedDate(today);
+      setImageUri(null);
     }
   }, [isEditing, initialData]);
 
@@ -117,6 +122,7 @@ export const ObservationForm: React.FC<ObservationFormProps> = ({
         await onSave({
           name: name.trim(),
           observationDate,
+          imageUri: imageUri || undefined,
         });
       } else {
         // Création
@@ -129,6 +135,7 @@ export const ObservationForm: React.FC<ObservationFormProps> = ({
           observationDate,
           latitude,
           longitude,
+          imageUri: imageUri || undefined,
         });
       }
     } catch (error) {
@@ -159,10 +166,11 @@ export const ObservationForm: React.FC<ObservationFormProps> = ({
       style={styles.container}
     >
       <View style={styles.form}>
-        <View style={styles.imagePlaceholder}>
-          <Text style={styles.imagePlaceholderText}>Image</Text>
-          <Text style={styles.imagePlaceholderSubtext}>Image (à venir)</Text>
-        </View>
+        <ImageSelector
+          imageUri={imageUri || undefined}
+          onImageSelected={setImageUri}
+          disabled={isLoading}
+        />
 
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Nom</Text>
@@ -291,23 +299,6 @@ const styles = StyleSheet.create({
   form: {
     flex: 1,
     padding: 20,
-  },
-  imagePlaceholder: {
-    height: 120,
-    backgroundColor: '#e9ecef',
-    borderRadius: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 30,
-    alignSelf: 'center',
-  },
-  imagePlaceholderText: {
-    fontSize: 40,
-    marginBottom: 5,
-  },
-  imagePlaceholderSubtext: {
-    fontSize: 12,
-    color: '#666',
   },
   inputGroup: {
     marginBottom: 20,
