@@ -4,6 +4,7 @@ export interface Observation {
   observationDate: string;
   latitude: number;
   longitude: number;
+  imageUri?: string;
 }
 
 export interface CreateObservationData {
@@ -11,6 +12,7 @@ export interface CreateObservationData {
     observationDate: string;
     latitude: number;
     longitude: number;
+    imageUri?: string;
 }
 
 export interface UpdateObservationData {

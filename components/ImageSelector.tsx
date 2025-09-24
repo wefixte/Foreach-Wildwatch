@@ -27,18 +27,35 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
   const [showOptions, setShowOptions] = useState(false);
 
   const requestPermissions = async () => {
-    const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
-    const { status: mediaStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
-    if (cameraStatus !== 'granted' || mediaStatus !== 'granted') {
+    try {
+      // Demander les permissions de caméra
+      const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
+      
+      // Demander les permissions de galerie
+      const { status: mediaStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
+      // Vérifier si les permissions sont accordées
+      const hasCameraPermission = cameraStatus === 'granted';
+      const hasMediaPermission = mediaStatus === 'granted';
+      
+      if (!hasCameraPermission && !hasMediaPermission) {
+        Alert.alert(
+          'Permissions requises',
+          'Cette application a besoin d\'accéder à votre appareil photo et à votre galerie pour ajouter des images.',
+          [{ text: 'OK' }]
+        );
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Erreur lors de la demande de permissions:', error);
       Alert.alert(
-        'Permissions requises',
-        'Cette application a besoin d\'accéder à votre appareil photo et à votre galerie pour ajouter des images.',
-        [{ text: 'OK' }]
+        'Erreur',
+        'Une erreur est survenue lors de la demande des permissions.'
       );
       return false;
     }
-    return true;
   };
 
   const showImageOptions = () => {
@@ -67,9 +84,17 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
   };
 
   const takePicture = async () => {
-    if (!(await requestPermissions())) return;
-    
     try {
+      const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
+      
+      if (cameraStatus !== 'granted') {
+        Alert.alert(
+          'Permission caméra requise',
+          'Cette application a besoin d\'accéder à votre appareil photo pour prendre des photos.'
+        );
+        return;
+      }
+      
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -81,14 +106,23 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
         onImageSelected(result.assets[0].uri);
       }
     } catch (error) {
+      console.error('Erreur lors de la prise de photo:', error);
       Alert.alert('Erreur', 'Impossible de prendre une photo');
     }
   };
 
   const pickImage = async () => {
-    if (!(await requestPermissions())) return;
-    
     try {
+      const { status: mediaStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
+      if (mediaStatus !== 'granted') {
+        Alert.alert(
+          'Permission galerie requise',
+          'Cette application a besoin d\'accéder à votre galerie pour sélectionner des images.'
+        );
+        return;
+      }
+      
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -100,6 +134,7 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
         onImageSelected(result.assets[0].uri);
       }
     } catch (error) {
+      console.error('Erreur lors de la sélection d\'image:', error);
       Alert.alert('Erreur', 'Impossible de sélectionner une image');
     }
   };

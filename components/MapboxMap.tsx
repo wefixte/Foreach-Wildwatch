@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Alert, Text } from 'react-native';
+import { View, StyleSheet, Alert, Text, Image } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
 import Constants from 'expo-constants';
 import { LocationData } from '../hooks/useCurrentPosition';
@@ -109,11 +109,27 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
             onSelected={() => handleMarkerPress(observation)}
           >
             <View style={styles.markerContainer}>
-              <View style={styles.observationMarker}>
-                <Text style={styles.markerText}>
-                  {observation.name.charAt(0).toUpperCase()}
-                </Text>
-              </View>
+              {observation.imageUri ? (
+                <View style={styles.observationMarkerWithImage}>
+                  <Image 
+                    source={{ uri: observation.imageUri }} 
+                    style={styles.markerImage}
+                    resizeMode="cover"
+                    onError={(error) => {
+                      console.log('Erreur de chargement de l\'image:', error.nativeEvent.error);
+                    }}
+                    onLoad={() => {
+                      console.log('Image chargée avec succès');
+                    }}
+                  />
+                </View>
+              ) : (
+                <View style={styles.observationMarker}>
+                  <Text style={styles.markerText}>
+                    {observation.name.charAt(0).toUpperCase()}
+                  </Text>
+                </View>
+              )}
             </View>
           </Mapbox.PointAnnotation>
         ))}
@@ -175,6 +191,28 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    overflow: 'hidden',
+  },
+  observationMarkerWithImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 3,
+    borderColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    overflow: 'hidden',
+  },
+  markerImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
   },
   markerText: {
     color: 'white',

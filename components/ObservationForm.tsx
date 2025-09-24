@@ -294,11 +294,10 @@ export const ObservationForm: React.FC<ObservationFormProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
   },
   form: {
-    flex: 1,
     padding: 20,
+    backgroundColor: 'white',
   },
   inputGroup: {
     marginBottom: 20,
