@@ -214,5 +214,5 @@ Développé dans le cadre du Mobile Bootcamp Foreach Academy.
 
 ---
 
-**Wildwatch** - Observer, Enregistrer, Partager la Faune Sauvage 🦅
+**Wildwatch** - Observer, Enregistrer, Partager la Faune et la Flore Sauvage 🦅
 ```
