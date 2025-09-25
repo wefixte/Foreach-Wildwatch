@@ -1,6 +1,6 @@
-# 🦅 Wildwatch - Application d'Observation de la Faune
+# 🦅 Wildwatch - Application d'Observation de la Faune et de la Flore
 
-Wildwatch est une application mobile React Native développée avec Expo qui permet aux utilisateurs de créer, visualiser et gérer des observations de la faune sauvage directement sur une carte interactive.
+Wildwatch est une application mobile React Native développée avec Expo qui permet aux utilisateurs de créer, visualiser et gérer des observations de la faune et flore sauvage directement sur une carte interactive.
 
 ## ✨ Fonctionnalités Principales
 
